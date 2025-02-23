@@ -1,13 +1,12 @@
 # README - Flask Tiny App
 
 ## 1. Thông tin cá nhân
-- **Họ tên:** [Điền họ tên của bạn]
-- **Mã sinh viên:** [Điền mã sinh viên của bạn]
+- **Họ tên:** [Trần Văn Huy]
+- **Mã sinh viên:** [21130971]
 
 ## 2. Mô tả Project
 **Flask Tiny App** là một ứng dụng web nhỏ gọn được xây dựng bằng Flask. Dự án bao gồm:
 - **Blog:** Cho phép người dùng đăng, chỉnh sửa và xóa bài viết.
-- **To-do List:** Hỗ trợ quản lý danh sách công việc cần làm.
 
 Mục tiêu của dự án là giúp làm quen với Flask, thiết kế API cơ bản và triển khai ứng dụng web.
 
