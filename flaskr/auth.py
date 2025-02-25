@@ -1,8 +1,7 @@
 import functools
+import secrets
 
-from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for
-)
+from flask import (Blueprint, flash, g, redirect, render_template, request, session, url_for)
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from flaskr.db import get_db
@@ -45,13 +44,11 @@ def login():
         password = request.form['password']
         db = get_db()
         error = None
-        user = db.execute(
-            'SELECT * FROM user WHERE username = ?', (username,)
-        ).fetchone()
+        user = db.execute('SELECT * FROM user WHERE username = ?', (username,)).fetchone()
 
         if user is None:
             error = 'Incorrect username.'
-        elif not check_password_hash(user['password'], password):
+        elif user and not check_password_hash(user['password'], password):
             error = 'Incorrect password.'
 
         if error is None:
@@ -70,14 +67,56 @@ def load_logged_in_user():
     if user_id is None:
         g.user = None
     else:
-        g.user = get_db().execute(
+        user = get_db().execute(
             'SELECT * FROM user WHERE id = ?', (user_id,)
         ).fetchone()
+
+        if user:
+            user_dict = dict(user)
+            is_blocked = user_dict.get('is_blocked')
+            if is_blocked is not None and bool(is_blocked):
+                g.user = None
+                flash('Tài khoản của bạn đã bị khóa.')
+                session.clear()
+            else:
+                g.user = user
+        else:
+            g.user = None
         
 @bp.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('index'))
+
+@bp.route('/create_admin', methods=('GET', 'POST'))
+def create_admin():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        db = get_db()
+        error = None
+
+        if not username:
+            error = 'Username is required.'
+        elif not password:
+            error = 'Password is required.'
+
+        if error is None:
+            try:
+                db.execute(
+                    "INSERT INTO user (username, password, role) VALUES (?, ?, ?)",
+                    (username, generate_password_hash(password), 'admin'),  # Gán vai trò admin
+                )
+                db.commit()
+            except db.IntegrityError:
+                error = f"User {username} is already registered."
+            else:
+                return redirect(url_for("index"))  # Chuyển hướng đến trang blog
+
+        flash(error)
+
+    return render_template('auth/create_admin.html')  # Tạo template create_admin.html
 
 def login_required(view):
     @functools.wraps(view)
