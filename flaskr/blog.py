@@ -98,23 +98,22 @@ def delete(id):
 @bp.route('/delete_multiple', methods=('GET',))
 @login_required
 def delete_multiple():
-    if g.user['role'] != 'admin':
-        abort(403)
-
     db = get_db()
+    # Lấy TẤT CẢ bài viết
     posts = db.execute(
-        'SELECT p.id, title, body, created, author_id, username'  # Đã thêm p.id
+        'SELECT p.id, title, body, created, author_id, username'
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' ORDER BY created DESC'
     ).fetchall()
-    return render_template('blog/delete_multiple.html', posts=posts)
 
-@bp.route('/delete_multiple', methods=('POST',))  # Route POST để xử lý xóa
+    # Lọc bài viết của người dùng hiện tại
+    user_posts = [post for post in posts if post['author_id'] == g.user['id']]
+
+    return render_template('blog/delete_multiple.html', posts=user_posts)
+
+@bp.route('/delete_multiple', methods=('POST',))
 @login_required
-def delete_multiple_process():  # Tên hàm nên khác với hàm GET để rõ ràng
-    if g.user['role'] != 'admin':
-        abort(403)
-
+def delete_multiple_process():
     post_ids = request.form.getlist('post_ids')
     if not post_ids:
         flash('Vui lòng chọn ít nhất một bài viết để xóa.')
@@ -123,13 +122,24 @@ def delete_multiple_process():  # Tên hàm nên khác với hàm GET để rõ 
     db = get_db()
     try:
         for post_id in post_ids:
-            db.execute('DELETE FROM post WHERE id = ?', (post_id,))
-        db.commit()
-        flash('Đã xóa thành công các bài viết đã chọn.')
-    except Exception as e:
-        # Xử lý lỗi (ví dụ: ghi log)
-        db.rollback()
-        flash('Đã có lỗi xảy ra khi xóa bài viết. Vui lòng thử lại.')
-        return redirect(url_for('blog.index'))  # Vẫn chuyển hướng về trang blog khi có lỗi
+            # Lấy thông tin bài viết để kiểm tra tác giả
+            post = get_post(post_id, check_author=False)  # check_author=False để bỏ qua kiểm tra tác giả ban đầu
 
-    return redirect(url_for('blog.index'))  # Chuyển hướng về trang blog sau khi xóa thành công
+            if post is None:  # Bài viết không tồn tại
+                flash(f'Bài viết với id {post_id} không tồn tại.')
+                continue  # Bỏ qua bài viết này và tiếp tục vòng lặp
+
+            if post['author_id'] != g.user['id']:  # Kiểm tra tác giả
+                flash(f'Bạn không có quyền xóa bài viết {post["title"]}.')
+                continue  # Bỏ qua bài viết này và tiếp tục vòng lặp
+
+            db.execute('DELETE FROM post WHERE id = ?', (post_id,))  # Xóa bài viết
+            flash(f'Đã xóa bài viết {post["title"]}.')
+
+        db.commit()
+
+    except Exception as e:
+        db.rollback()
+        flash(f'Đã có lỗi xảy ra: {e}')
+
+    return redirect(url_for('blog.index'))

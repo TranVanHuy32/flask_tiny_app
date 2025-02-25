@@ -5,8 +5,8 @@
 {% endblock %}
 
 {% block content %}
-    <form action="{{ url_for('blog.delete_multiple') }}" method="post">  {% for post in posts %}
-            <div>
+    <form action="{{ url_for('blog.delete_multiple') }}" method="post">
+        {% for post in posts %}  <div>
                 <input type="checkbox" name="post_ids" value="{{ post['id'] }}">
                 <h2>{{ post['title'] }}</h2>
                 <p>{{ post['body'] }}</p>
