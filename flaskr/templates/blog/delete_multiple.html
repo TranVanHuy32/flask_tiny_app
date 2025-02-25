@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block header %}
+    <h1>Xóa nhiều bài viết</h1>
+{% endblock %}
+
+{% block content %}
+    <form action="{{ url_for('blog.delete_multiple') }}" method="post">  {% for post in posts %}
+            <div>
+                <input type="checkbox" name="post_ids" value="{{ post['id'] }}">
+                <h2>{{ post['title'] }}</h2>
+                <p>{{ post['body'] }}</p>
+                <p>Tác giả: {{ post['username'] }}</p>
+                <p>Ngày tạo: {{ post['created'] }}</p>
+            </div>
+        {% endfor %}
+        <button type="submit">Xóa các bài viết đã chọn</button>
+    </form>
+{% endblock %}
