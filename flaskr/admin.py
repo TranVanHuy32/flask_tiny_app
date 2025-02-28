@@ -76,7 +76,7 @@ def block_user(id):
 
     if user and user['id'] == session.get('user_id'):
         session.clear()
-        flash('Tài khoản của bạn đã bị khóa.')
+        
 
     db = get_db()
     db.execute('UPDATE user SET is_blocked = 1 WHERE id = ?', (id,))

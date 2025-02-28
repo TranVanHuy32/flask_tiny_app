@@ -76,8 +76,9 @@ def load_logged_in_user():
             is_blocked = user_dict.get('is_blocked')
             if is_blocked is not None and bool(is_blocked):
                 g.user = None
-                flash('Tài khoản của bạn đã bị khóa.')
                 session.clear()
+                flash('Tài khoản đã bị khóa. Mời đăng nhập lại.')
+                return redirect(url_for('auth.login')) # Thêm chuyển hướng
             else:
                 g.user = user
         else:
@@ -127,3 +128,14 @@ def login_required(view):
         return view(**kwargs)
 
     return wrapped_view
+
+@bp.route('/admin/users', methods=('GET',))
+@login_required
+def admin_users():
+    if g.user['role'] != 'admin':
+        abort(403)  # Chỉ admin mới có quyền truy cập
+
+    db = get_db()
+    users = db.execute('SELECT id, username, role FROM user').fetchall()
+
+    return render_template('admin/users.html', users=users)

@@ -6,6 +6,9 @@
     <ul>
         {% if g.user %}
             <li><span>{{ g.user['username'] }}</span>
+            {% if g.user['role'] == 'admin' %}
+                <li><a href="{{ url_for('admin.users') }}">Admin</a>
+            {% endif %}
             <li><a href="{{ url_for('auth.logout') }}">Log Out</a>
         {% else %}
             <li><a href="{{ url_for('auth.register') }}">Register</a>
@@ -19,11 +22,12 @@
         {% block header %}{% endblock %}
     </header>
 
-    {% with messages = get_flashed_messages() %}  {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-danger">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-danger">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
     {% endwith %}
 
     {% block content %}{% endblock %}

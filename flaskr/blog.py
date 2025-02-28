@@ -95,6 +95,12 @@ def delete(id):
     db.commit()
     return redirect(url_for('blog.index'))
 
+@bp.route('/<int:id>/detail', methods=('GET',))
+def detail(id):
+    
+    post = get_post(id, check_author=False) # check_author=False để bỏ qua kiểm tra tác giả
+    return render_template('blog/detail.html', post=post)
+
 @bp.route('/delete_multiple', methods=('GET',))
 @login_required
 def delete_multiple():
