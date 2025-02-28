@@ -35,5 +35,4 @@ Mục tiêu của dự án là giúp làm quen với Flask, thiết kế API cơ
    ```
 4. Truy cập trình duyệt tại: [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
-## 4. Link Project đã triển khai
-- [Link Deploy Heroku/Vercel/Render/...](#) *(Cập nhật link khi triển khai)*
+
