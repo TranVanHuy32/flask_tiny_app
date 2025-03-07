@@ -36,3 +36,10 @@ Mục tiêu của dự án là giúp làm quen với Flask, thiết kế API cơ
 4. Truy cập trình duyệt tại: [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
 
+5. Tài khoản admin truy cập trang admin:
+	Tên tài khoản:Huy32
+	Mật khẩu:03022003
+
+
+
+
